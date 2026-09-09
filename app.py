@@ -40,6 +40,12 @@ if start_button:
                 encoding="utf-8"
             )
         
+        with st.expander("Показать журнал парсера", expanded=True):
+            st.code(result.stdout or "Парсер ничего не сообщил")
+
+            if result.stderr:
+                st.code(result.stderr)
+
         if result.returncode == 0:
             st.success("Сбор успешно завершен!")
         else:
