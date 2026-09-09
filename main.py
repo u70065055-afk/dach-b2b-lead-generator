@@ -570,19 +570,24 @@ def main() -> None:
             log("Запуск браузера Chromium...")
 
             browser = playwright.chromium.launch(
-                headless=HEADLESS,
+                headless=True,
                 args=[
-                    "--disable-blink-features=AutomationControlled",
+                    "--no-sandbox",
                     "--disable-dev-shm-usage",
-                    "--no-default-browser-check",
-                    "--disable-notifications",
-                    "--start-maximized",
                 ],
             )
 
-            log("Браузер успешно запущен.")
+            context = browser.new_context(
+                user_agent=(
+                    "Mozilla/5.0 (X11; Linux x86_64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/124.0.0.0 Safari/537.36"
+                ),
+                locale="de-DE",
+            )
 
-            context = create_context(browser)
+            log("Браузер запущен.")
+
             page = context.new_page()
 
             search_url = (
@@ -590,15 +595,13 @@ def main() -> None:
                 f"{quote_plus(SEARCH_QUERY)}?hl=de"
             )
 
-            log(f"Открываем Google Maps: {search_url}")
-
             page.goto(
                 search_url,
                 wait_until="domcontentloaded",
                 timeout=30_000,
             )
 
-            log(f"Google Maps открыт. URL: {page.url}")
+            log(f"Google Maps открыт: {page.url}")
 
             accept_consent(page)
             pause(1.5, 2.8)
