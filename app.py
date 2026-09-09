@@ -8,7 +8,8 @@ import streamlit as st
 import pandas as pd
 import pathlib
 import subprocess
-
+import subprocess
+subprocess.run(["playwright", "install", "chromium"])
 st.set_page_config(page_title="DACH B2B Lead Generator", layout="wide")
 
 st.title("🎯 DACH B2B Lead Generator")
