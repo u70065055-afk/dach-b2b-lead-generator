@@ -543,6 +543,7 @@ def save_results(
         OUTPUT_FILE,
         index=False,
         encoding="utf-8-sig",
+        sep=";",
     )
 
     log(
