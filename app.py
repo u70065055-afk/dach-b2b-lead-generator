@@ -60,9 +60,9 @@ if csv_file.exists():
     
     # Игнорируем битые строки с нетипичным количеством запятых
     try:
-        df = pd.read_csv(csv_file, on_bad_lines='skip', engine='python')
+        df = pd.read_csv(csv_file, sep=";", encoding="utf-8-sig", on_bad_lines="skip", engine="python")
     except Exception:
-        df = pd.read_csv(csv_file, sep=';', on_bad_lines='skip', engine='python')
+        df = pd.read_csv(csv_file, on_bad_lines="skip", engine="python")
 
     st.dataframe(df, use_container_width=True)
 
