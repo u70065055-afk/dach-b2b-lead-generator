@@ -9,7 +9,7 @@ import pandas as pd
 import pathlib
 import subprocess
 import subprocess
-subprocess.run(["playwright", "install", "chromium"])
+subprocess.run([sys.executable, "-m", "playwright", "install"])
 st.set_page_config(page_title="DACH B2B Lead Generator", layout="wide")
 
 st.title("🎯 DACH B2B Lead Generator")
@@ -57,12 +57,22 @@ if start_button:
 
 if csv_file.exists():
     st.subheader("📊 Собранные данные")
-    df = pd.read_csv(csv_file)
-    st.dataframe(df, use_container_width=True)
     
+    # Игнорируем битые строки с нетипичным количеством запятых
+    try:
+        df = pd.read_csv(csv_file, on_bad_lines='skip', engine='python')
+    except Exception:
+        df = pd.read_csv(csv_file, sep=';', on_bad_lines='skip', engine='python')
+
+    st.dataframe(df, use_container_width=True)
+
+    # Форматируем данные строго под немецкий Excel (разделитель ";" и UTF-8 BOM)
+    csv_data = "sep=;\n" + df.to_csv(index=False, sep=";", encoding="utf-8-sig")
+
     st.download_button(
-        label="📥 Скачать базу в CSV",
-        data=csv_file.read_text(encoding="utf-8"),
+        label="💾 Скачать базу в CSV",
+        data=csv_data,
         file_name=f"leads_{city}_{niche}.csv",
         mime="text/csv",
     )
+    
