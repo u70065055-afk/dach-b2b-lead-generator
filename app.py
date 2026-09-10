@@ -1,3 +1,4 @@
+import io
 import sys
 import asyncio
 
@@ -58,21 +59,20 @@ if start_button:
 if csv_file.exists():
     st.subheader("📊 Собранные данные")
     
-    # Игнорируем битые строки с нетипичным количеством запятых
-    try:
-        df = pd.read_csv(csv_file, sep=";", encoding="utf-8-sig", on_bad_lines="skip", engine="python")
-    except Exception:
-        df = pd.read_csv(csv_file, on_bad_lines="skip", engine="python")
-
+    # Читаем собранный CSV
+    df = pd.read_csv(csv_file, sep=";", encoding="utf-8-sig", on_bad_lines="skip", engine="python")
     st.dataframe(df, use_container_width=True)
 
-    # Форматируем данные строго под немецкий Excel (разделитель ";" и UTF-8 BOM)
-    csv_data = "sep=;\n" + df.to_csv(index=False, sep=";", encoding="utf-8-sig")
+    # Конвертируем DataFrame в Excel (.xlsx) в памяти
+    buffer = io.BytesIO()
+    with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="Leads")
 
+    # Кнопка скачивания XLSX
     st.download_button(
-        label="💾 Скачать базу в CSV",
-        data=csv_data,
-        file_name=f"leads_{city}_{niche}.csv",
-        mime="text/csv",
+        label="📥 Скачать базу в Excel (.xlsx)",
+        data=buffer.getvalue(),
+        file_name=f"leads_{city}_{niche}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
     
